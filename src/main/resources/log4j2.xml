@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="base.log.dir">${sys:chassis.logs.location}</Property>
+        <Property name="appenderPatternLayout">[%t] %d{dd MMM yyyy HH:mm:ss,SSSZ}{UTC} %-5p %-15c{1} [%X]: %m%ex%n</Property>
+        <Property name="maxLogFileSize">10 MB</Property>
+        <Property name="maxLogFiles">2</Property>
+
+        <!--The following variables can be overridden as jvm args during application startup. If log4j2 does not find these system variables then it will use these default values-->
+        <Property name="CAP1_LOGLEVEL">info</Property>
+        <Property name="PERF_LOGLEVEL">info</Property>
+        <Property name="ROOT_LOGLEVEL">info</Property>
+        <Property name="PROFILE_LOGLEVEL">info</Property>
+        <Property name="AUDIT_LOGLEVEL">info</Property>
+        <Property name="IDB_DE_LOGLEVEL">info</Property>
+    </Properties>
+    <Appenders>
+    
+        <Console name="Console-Appender" target="SYSTEM_OUT">
+			<PatternLayout>
+				<pattern>
+					[%t] %d{dd MMM yyyy HH:mm:ss,SSSZ}{UTC} UTC %-5p %-15c{1} [%X]: %m%ex%n
+				</pattern>
+				
+			</PatternLayout>
+		</Console>
+		
+		
+        <RollingRandomAccessFile name="APPLOGFILE" 
+								 fileName="${base.log.dir}/app.log"
+                                 filePattern="${base.log.dir}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz" append="true">
+            <PatternLayout pattern="${appenderPatternLayout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${maxLogFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${maxLogFiles}"/>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="SYSLOGFILE"
+                                 fileName="${base.log.dir}/sys.log"
+                                 filePattern="${base.log.dir}/$${date:yyyy-MM}/sys-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="${appenderPatternLayout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${maxLogFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${maxLogFiles}"/>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="PERFLOGFILE"
+                                 fileName="${base.log.dir}/perf.log"
+                                 filePattern="${base.log.dir}/perf-fallback-%i.log">
+            <PatternLayout pattern="${appenderPatternLayout}"/>
+            <Policies>
+                <!-- Larger size helps Splunk process during high load -->
+                <SizeBasedTriggeringPolicy size="25 MB"/>
+            </Policies>
+            <!-- Single backup should reduce likelihood of logs dropped during rotation -->
+            <DefaultRolloverStrategy max="1"/>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="WSTRACEFILE"
+                                 fileName="${base.log.dir}/wstrace.log"
+                                 filePattern="${base.log.dir}/$${date:yyyy-MM}/wstrace-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="${appenderPatternLayout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${maxLogFileSize}" />
+            </Policies>
+            <DefaultRolloverStrategy max="${maxLogFiles}"/>
+        </RollingRandomAccessFile>
+        
+          <RollingRandomAccessFile name="AUDITLOGFILE"
+                     fileName="${base.log.dir}/audit_errors/audit_errors.log"
+                     filePattern="$${date:yyyy-MM}/audit-errors-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="${appenderPatternLayout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${maxLogFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${maxLogFiles}"/>
+        </RollingRandomAccessFile>
+        
+        
+         <RollingRandomAccessFile name="AUDITFORWARDLOGFILE"
+                     fileName="${base.log.dir}/audit_forward_errors/audit_forward_errors.log"
+                     filePattern="$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="${appenderPatternLayout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${maxLogFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${maxLogFiles}"/>
+        </RollingRandomAccessFile>
+        
+        <RollingRandomAccessFile name="AUDITDEFAULTFALLBACKLOGFILE"
+                                 fileName="${base.log.dir}/audit_fallback/audit-default-fallback.log"
+                                 filePattern="${base.log.dir}/audit-default-fallback-%i.log.gz">
+            <PatternLayout pattern="${appenderPatternLayout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${maxLogFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${maxLogFiles}"/>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="AUDITSTREAMFALLBACKLOGFILE"
+                                 fileName="${base.log.dir}/audit_fallback/audit-stream-fallback.log"
+                                 filePattern="${base.log.dir}/audit-stream-fallback-%i.log.gz">
+            <PatternLayout pattern="${appenderPatternLayout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${maxLogFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${maxLogFiles}"/>
+        </RollingRandomAccessFile>
+        
+    </Appenders>
+
+    <Loggers>
+        <!-- ******************************************* -->
+        <!-- application categories                      -->
+        <!-- ******************************************* -->
+        <Logger name="com.capitalone" level="${sys:CAP1_LOGLEVEL}" additivity="false" includeLocation="false">
+            <AppenderRef ref="APPLOGFILE"/>
+        </Logger>
+        <!-- ******************************************* -->
+        <!-- Enable WebService tracing                   -->
+        <!-- ******************************************* -->
+        <Logger name="com.capitalone.chassis.engine.consumerservices.servicelocator.handlers" level="${sys:CAP1_LOGLEVEL}"
+                additivity="false" includeLocation="false">
+            <AppenderRef ref="WSTRACEFILE"/>
+        </Logger>
+        <!-- ******************************************* -->
+        <!-- audit log categories -->
+        <!-- ******************************************* -->
+        <Logger name="com.capitalone.chassis.engine.audit.error.AuditErrorListener"
+                level="${sys:AUDIT_LOGLEVEL}" additivity="false">
+            <AppenderRef ref="AUDITLOGFILE" />
+        </Logger>
+        <!-- ******************************************* -->
+        <!-- audit forward log categories -->
+        <!-- ******************************************* -->
+        <Logger
+                name="com.capitalone.chassis.engine.audit.service.util.AuditFileCapture"
+                level="${sys:AUDIT_LOGLEVEL}" additivity="false" includeLocation="false">
+            <AppenderRef ref="AUDITFORWARDLOGFILE" />
+        </Logger>
+        <!-- ********************************************* -->
+        <!-- Logging for DevExchange calls                 -->
+        <!-- ********************************************* -->
+        <Logger name="com.capitalone.identity.identitybuilder.policycore.service.dao.impl.DevExchangeDAOImpl"
+                level="warn" additivity="false" includeLocation="false">
+            <AppenderRef ref="Console-Appender" />
+        </Logger>
+        <!-- ********************************************* -->
+        <!-- Suppress chatty Kafka logging                 -->
+        <!-- ********************************************* -->
+        <Logger name="org.apache.kafka.clients.producer.ProducerConfig"
+                level="warn" additivity="false" includeLocation="false">
+            <AppenderRef ref="Console-Appender" />
+        </Logger>
+        <!-- ********************************************* -->
+        <!-- Logging for Externalized Policies             -->
+        <!-- ********************************************* -->
+        <Logger name="com.capitalone.identity.identitybuilder.policycore.camel.external"
+                level="info" additivity="false" includeLocation="false">
+            <AppenderRef ref="Console-Appender" />
+            <AppenderRef ref="APPLOGFILE"/>
+        </Logger>
+        <Logger name="com.capitalone.identity.identitybuilder.client"
+                level="info" additivity="false" includeLocation="false">
+            <AppenderRef ref="Console-Appender" />
+            <AppenderRef ref="APPLOGFILE"/>
+        </Logger>
+        <!-- ********************************************* -->
+        <!-- Logging for Externalized Rules and DMN engine -->
+        <!-- ********************************************* -->
+        <Logger name="com.capitalone.identity.identitybuilder.policycore.decisionengine"
+                level="info" additivity="false" includeLocation="false">
+            <AppenderRef ref="Console-Appender" />
+            <AppenderRef ref="APPLOGFILE"/>
+        </Logger>
+        <Logger name="com.capitalone.identity.identitybuilder.policycore.dmnrules"
+                level="info" additivity="false" includeLocation="false">
+            <AppenderRef ref="Console-Appender" />
+            <AppenderRef ref="APPLOGFILE"/>
+        </Logger>
+        <!-- Decision Engine logger
+        https://github.cloud.capitalone.com/identitybuilder/identity-builder-decision-engine -->
+        <Logger name="DecisionEngineEventLogger" level="${IDB_DE_LOGLEVEL}" additivity="false">
+            <AppenderRef ref="Console-Appender"/>
+            <AppenderRef ref="APPLOGFILE"/>
+        </Logger>
+        <!-- Config Store Client -->
+        <Logger name="identitybuilder.ConfigStoreClient" level="error" additivity="false">
+            <AppenderRef ref="Console-Appender"/>
+            <AppenderRef ref="APPLOGFILE"/>
+        </Logger>
+        <!-- ********************************************* -->
+        <!-- Setup the loggers for the performance metrics -->
+        <!-- ********************************************* -->
+        <Logger name="com.capitalone.chassis.engine.core.profile.ProfileAspect" level="${sys:PROFILE_LOGLEVEL}" additivity="false"
+                includeLocation="false">
+            <AppenderRef ref="APPLOGFILE"/>
+        </Logger>
+        <logger name="PerfLog" level="${sys:PERF_LOGLEVEL}" additivity="false">
+            <AppenderRef ref="PERFLOGFILE"/>
+        </logger>
+        <logger name="AUDITDEFAULTFALLBACKLOG" level="${sys:AUDIT_LOGLEVEL}" additivity="false">
+            <AppenderRef ref="AUDITDEFAULTFALLBACKLOGFILE"/>
+        </logger>
+
+        <logger name="AUDITSTREAMFALLBACKLOG" level="${sys:AUDIT_LOGLEVEL}" additivity="false">
+            <AppenderRef ref="AUDITSTREAMFALLBACKLOGFILE"/>
+        </logger>
+        <Root level="${sys:ROOT_LOGLEVEL}" includeLocation="false">
+            <AppenderRef ref="APPLOGFILE"/>
+            <!--<AppenderRef ref="Console-Appender"/>	-->
+        </Root>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="policy:config_management_multiple_versions_policies_0.0">
+    <from uri="policy:config_management_multiple_versions_policies_0.0"/>
+    <to uri="policy-configuration:property/customer.code?outputHeaderName=testOutputHeader"/>
+    <to uri="mock:end"/>
+  </route>
+</routes>

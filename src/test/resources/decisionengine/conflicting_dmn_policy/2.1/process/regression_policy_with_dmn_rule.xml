@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="policy:conflicting_dmn_policy_2.1">
+    <from uri="policy:conflicting_dmn_policy_2.1"/>
+    <setBody>
+      <groovy>
+        [
+        brTransactionName: 'test_rule_duplicate_1.dmn',
+        businessRulesInput: [ 'versionArgument': null ],
+        brDecisionOutputname: 'versionResult'
+        ]
+      </groovy>
+
+    </setBody>
+    <to uri="DmnRulesComponent:execute"/>
+
+    <setHeader name="result1">
+      <groovy>
+        headers.policyRuleResult.getResult()
+      </groovy>
+    </setHeader>
+    <setBody>
+      <groovy>
+        [
+        brTransactionName: 'test_rule_duplicate_2.dmn',
+        businessRulesInput: [ 'versionArgument': null ],
+        brDecisionOutputname: 'versionResult'
+        ]
+      </groovy>
+
+    </setBody>
+    <to uri="DmnRulesComponent:execute"/>
+    <setHeader name="result2">
+      <groovy>
+        headers.policyRuleResult.getResult()
+      </groovy>
+    </setHeader>
+    <setBody>
+      <groovy>
+        [
+        'policy': '2.1',
+        'decisionNode1' : headers.result1,
+        'decisionNode2' : headers.result2
+        ]
+      </groovy>
+    </setBody>
+
+    <to uri="mock:end"/>
+
+  </route>
+
+</routes>

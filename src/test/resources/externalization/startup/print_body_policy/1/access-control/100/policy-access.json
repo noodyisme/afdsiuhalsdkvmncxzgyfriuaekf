@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "schemaVersion": "0",
+  "policyNamespace": "externalization/startup/print_body_policy",
+  "policyMajorVersion": 1,
+  "clients": "*********** MALFORMED NEW VERSION OF POLICY ACCESS DOCUMENT **************"
+}

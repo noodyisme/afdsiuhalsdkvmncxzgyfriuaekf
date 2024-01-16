@@ -1,0 +1,22 @@
+[.lead]
+Exception Mappers Package Info
+
+This package is meant to be included in your Jersey runtime by registering the classes in your ResourceConfig class.
+You can do so by adding the following lines of code:
+....
+ register(JsonMappingExceptionMapper.class);
+        register(JsonParseExceptionMapper.class);
+        register(JsonProcessingExceptionMapper.class);
+....
+**_OR_**
+....
+ registerClasses(JsonProcessingExceptionMapper.class, JsonMappingExceptionMapper.class, JsonParseExceptionMapper.class);
+....
+
+Please ensure that the exception mapper classes you include come from **_OUR_** `+com.capitalone.identity.identitybuilder.policycore.service.exception.mappers+` package.
+
+If for some reason, an additional ExceptionMapper is needed, the class can be added to this package and no additional
+registration should be needed in the Jersey Runtime (restart required to load new ExceptionMapper)
+
+Please ensure that any new ExceptionMapper is unit tested and integration tested. A good starting point for this is the
+`+com.capitalone.identity.identitybuilder.policycore.service.exception.mappers+` test package.

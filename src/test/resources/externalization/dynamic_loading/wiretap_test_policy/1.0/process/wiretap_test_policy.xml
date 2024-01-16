@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <route id="setPolicyLocalVersionHeader">
+        <from uri="direct:setPolicyLocalVersionHeader"/>
+        <setHeader name="internalPolicyVersionHeader">
+            <constant>1.0.0</constant>
+        </setHeader>
+    </route>
+
+    <route id="policy:wiretap_test_policy_1.0">
+        <from uri="policy:wiretap_test_policy_1.0"/>
+        <to uri="mock:result"/>
+        <wireTap uri="direct:wiretapRoute"/>
+    </route>
+    <route id="direct:wiretap_test_policy_1.0-schema">
+        <from uri="direct:wiretap_test_policy_1.0-schema"/>
+        <to uri="mock:result"/>
+        <wireTap uri="direct:wiretapRoute"/>
+    </route>
+
+    <route id="direct:wiretapRoute">
+        <from uri="direct:wiretapRoute"/>
+        <log message="Wiretap invoked"/>
+        <to uri="mock:wiretapRoute"/>
+    </route>
+
+</routes>

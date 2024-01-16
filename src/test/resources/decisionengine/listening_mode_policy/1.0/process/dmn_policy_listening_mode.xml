@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="start_1">
+        <from uri="policy:listening_mode_policy_1.0"/>
+
+        <!-- Object Stores results for dmnEnrichStrategy -->
+        <setHeader name="policyRuleResults">
+            <groovy>[]</groovy>
+        </setHeader>
+
+        <!-- Referenced in audit processor -->
+        <setHeader name="dxHeaders">
+            <groovy>
+                [
+                'MB-Client-Config': 'test-clientConfig',
+                'Client-Correlation-Id':'test-correlationId'
+                ]
+            </groovy>
+        </setHeader>
+
+        <!-- Invoke No-Op Child Policy (no decisions) -->
+        <enrich strategyRef="dmnEnrichStrategy">
+            <constant>direct:simple_child_lookup_v0</constant>
+        </enrich>
+
+        <choice>
+            <when>
+                <simple>${body['httpStatus']} starts with "2" &amp;&amp; ${body['rulePassed']}</simple>
+                <!-- Invoke Simple Child Policy that sets body to result of Http call -->
+                <enrich strategyRef="dmnEnrichStrategy">
+                    <constant>direct:simple_child_v0</constant>
+                </enrich>
+
+                <choice>
+                    <when>
+                        <simple>${body['httpStatus']} starts with "2" &amp;&amp; ${body['rulePassed']}</simple>
+
+                        <!-- Invokes Second Child Policy: REQUIRES accountReferencIds[] IN HEADER -->
+                        <enrich strategyRef="dmnEnrichStrategy">
+                            <constant>direct:simple_child_split_v0</constant>
+                        </enrich>
+                        <choice>
+                            <when>
+                                <simple>${body['httpStatus']} starts with "2" &amp;&amp; ${body['rulePassed']}</simple>
+                                <setHeader name="isCustomerEligible">
+                                    <simple resultType="java.lang.Boolean">true</simple>
+                                </setHeader>
+                            </when>
+                        </choice>
+                    </when>
+                </choice>
+            </when>
+        </choice>
+
+
+        <!-- Simulates policy logic result -->
+        <setBody>
+            <simple>{"isTestPolicyRulePassed": false}</simple>
+        </setBody>
+
+        <to uri="DmnRulesComponent:audit"/>
+
+        <to uri="mock:end"/>
+
+    </route>
+    <!-- Represent a child policy that doesn't call DMN component for a decision, but performs an account lookup -->
+    <route id="simple_child_lookup_v0">
+        <from uri="direct:simple_child_lookup_v0"/>
+        <setBody>
+            <groovy>
+                [
+                'httpStatus': headers.accountLookupStatus,
+                'rulePassed': (headers.accountLookupStatus == 200 || headers.accountLookupStatus == 203)
+                ]
+            </groovy>
+        </setBody>
+    </route>
+
+    <!-- Represent a child policy-->
+    <!-- REQUIRES mobilePhoneNumber IN HEADER -->
+    <route id="simple_child_v0">
+        <from uri="direct:simple_child_v0"/>
+
+        <setHeader name="httpStatus">
+            <constant>200</constant>
+        </setHeader>
+
+        <when>
+            <simple>${headers.httpStatus} == 200 || ${headers.httpStatus} == 203</simple>
+            <!-- Construct Stable Phone Business rule input. -->
+            <setBody>
+                <groovy>
+                    import java.text.SimpleDateFormat
+                    import groovy.time.TimeCategory
+
+                    use(groovy.time.TimeCategory) {
+                    def date = new Date()
+                    def sdf = new SimpleDateFormat("yyyy-MM-dd")
+                    def entries = headers.accountLookupResults
+
+                    def body = [
+
+                    'brTransactionName': 'card_fraud_customer_overlap_phone_number_eligibility_3.0.dmn',
+                    'businessRulesInput':
+                    [
+                    'initialPhoneNumber' : headers.mobilePhoneNumber,
+                    'customerPhoneNumberDetails' : ['entries':entries] ,
+                    'currentDate' : sdf.format(date)
+                    ],
+                    'brDecisionOutputname': 'StablePhoneNumberCheck'
+
+                    ]
+
+                    return body
+                    }
+                </groovy>
+            </setBody>
+            <to uri="DmnRulesComponent:execute"/>
+        </when>
+
+        <setBody>
+            <!-- Simulate policy logic that sets body -->
+            <groovy>
+                [
+                'httpStatus': headers.httpStatus,
+                'rulePassed': true
+                ]
+            </groovy>
+        </setBody>
+    </route>
+
+    <!-- Represent a child policy that uses 'split' mechanism -->
+    <!-- REQUIRES accountReferenceIds[] IN HEADER -->
+    <route id="simple_child_split_v0">
+        <from uri="direct:simple_child_split_v0"/>
+
+        <split strategyRef="listStrategy" parallelProcessing="false">
+            <header>accountReferenceIds</header>
+
+            <!-- Construct Stable Phone Business rule input (simulates result of a devex call). -->
+
+            <setHeader name="accountReferenceId">
+                <groovy>body</groovy>
+            </setHeader>
+            <setHeader name="httpStatus">
+                <constant>200</constant>
+            </setHeader>
+            <!-- Transform to start with empty body. -->
+            <transform>
+                <groovy>
+                    if (headers.accountReferenceId == 'ID_SUSPENDED' ) {
+                    [isSuspended:true]
+                    } else {
+                    [isSuspended:false]
+                    }
+                </groovy>
+            </transform>
+
+
+            <when>
+                <simple>${headers.httpStatus} == 200 || ${headers.httpStatus} == 203</simple>
+                <!-- Construct Customer Behaviour rule input. -->
+                <script>
+                    <groovy>
+                        body.brTransactionName = 'card_fraud_customer_overlap_customer_behavior_3.0.dmn'
+                        body.businessRulesInput = ['customerCreditCardStatus' : body]
+                        body.brDecisionOutputname = "CustomerEligibilityOnFinancialBehaviour"
+                    </groovy>
+                </script>
+                <!-- Construct Customer Behaviour rule input. -->
+                <to uri="DmnRulesComponent:execute"/>
+            </when>
+
+            <setBody>
+                <!-- Simulate policy logic that sets body -->
+                <groovy>
+                    [
+                    'httpStatus': headers.httpStatus,
+                    'rulePassed': false
+                    ]
+                </groovy>
+            </setBody>
+        </split>
+
+        <setBody>
+            <!-- Simulate policy logic that sets body -->
+            <groovy>
+                [
+                'httpStatus': headers.httpStatus,
+                'rulePassed': false
+                ]
+            </groovy>
+        </setBody>
+    </route>
+</routes>

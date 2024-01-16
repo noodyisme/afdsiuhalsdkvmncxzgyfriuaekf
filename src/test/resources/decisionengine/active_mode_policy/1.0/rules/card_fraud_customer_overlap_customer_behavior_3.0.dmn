@@ -1,0 +1,92 @@
+<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns="CustomerEligibilityOnFinancialBehaviour" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:kie="http://www.drools.org/kie/dmn/1.2" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/" id="_160C5759-9D4C-4CC5-AE6C-F31408F07ED4" name="CustomerEligibilityOnFinancialBehaviour" expressionLanguage="feel" typeLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/" namespace="CustomerEligibilityOnFinancialBehaviour">
+  <dmn:extensionElements/>
+  <dmn:decision id="_130C305D-8458-4694-B730-C90F9B4E72AD" name="CustomerEligibilityOnFinancialBehaviour">
+    <dmn:extensionElements/>
+    <dmn:variable id="_522F86F6-44CE-4327-8126-DD1D71D908CE" name="CustomerEligibilityOnFinancialBehaviour" typeRef="Any"/>
+    <dmn:informationRequirement id="_93EB4C34-2290-404F-9D68-E5842E2A67B7">
+      <dmn:requiredInput href="#_AE8916FE-9FC6-4D5E-B68B-A44EB5FB395B"/>
+    </dmn:informationRequirement>
+    <dmn:literalExpression id="_EAA36E79-8543-4CB4-BB85-E245573AFB2B">
+      <dmn:text>{
+        "isCustomerEligibleOnFinancialBehaviour" : (not(customerCreditCardStatus.isSuspended))
+        }   </dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:inputData id="_AE8916FE-9FC6-4D5E-B68B-A44EB5FB395B" name="customerCreditCardStatus">
+    <dmn:extensionElements/>
+    <dmn:variable id="_4317DB89-0569-4789-93DB-72BC23E5410B" name="customerCreditCardStatus" typeRef="Any"/>
+  </dmn:inputData>
+  <dmn:association id="_4457FDD4-62B4-4410-9118-ED430A271D7F" associationDirection="None">
+    <dmn:sourceRef href="#_AE8916FE-9FC6-4D5E-B68B-A44EB5FB395B"/>
+    <dmn:targetRef href="#_DAD3F051-2C14-4564-BB50-A5D7638A1EEA"/>
+  </dmn:association>
+  <dmn:association id="_0CB917E5-CAF8-45E5-A68F-66B2DDE6E271" associationDirection="None">
+    <dmn:sourceRef href="#_130C305D-8458-4694-B730-C90F9B4E72AD"/>
+    <dmn:targetRef href="#_CE011CA5-7F97-443F-A065-4515EB835821"/>
+  </dmn:association>
+  <dmn:textAnnotation id="_DAD3F051-2C14-4564-BB50-A5D7638A1EEA" textFormat="text/plain">
+    <dmn:text>Customer credit card account status object containing attributed of customer financial behaviour</dmn:text>
+  </dmn:textAnnotation>
+  <dmn:textAnnotation id="_CE011CA5-7F97-443F-A065-4515EB835821" textFormat="text/plain">
+    <dmn:text>Customer Financial Behaviour Check:Customer is eligible if there are no fraud flags in the existing accounts and customer level entitlements are passed</dmn:text>
+  </dmn:textAnnotation>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <di:extension>
+        <kie:ComponentsWidthsExtension>
+          <kie:ComponentWidths dmnElementRef="_EAA36E79-8543-4CB4-BB85-E245573AFB2B">
+            <kie:width>1346</kie:width>
+          </kie:ComponentWidths>
+        </kie:ComponentsWidthsExtension>
+      </di:extension>
+      <dmndi:DMNShape id="dmnshape-_130C305D-8458-4694-B730-C90F9B4E72AD" dmnElementRef="_130C305D-8458-4694-B730-C90F9B4E72AD" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor red="255" green="255" blue="255"/>
+          <dmndi:StrokeColor red="0" green="0" blue="0"/>
+          <dmndi:FontColor red="0" green="0" blue="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds x="710.5" y="33" width="195" height="83"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="dmnshape-_AE8916FE-9FC6-4D5E-B68B-A44EB5FB395B" dmnElementRef="_AE8916FE-9FC6-4D5E-B68B-A44EB5FB395B" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor red="255" green="255" blue="255"/>
+          <dmndi:StrokeColor red="0" green="0" blue="0"/>
+          <dmndi:FontColor red="0" green="0" blue="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds x="710.8130841121497" y="270" width="193" height="52"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="dmnshape-_DAD3F051-2C14-4564-BB50-A5D7638A1EEA" dmnElementRef="_DAD3F051-2C14-4564-BB50-A5D7638A1EEA" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor red="255" green="255" blue="255"/>
+          <dmndi:StrokeColor red="0" green="0" blue="0"/>
+          <dmndi:FontColor red="0" green="0" blue="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds x="719" y="393" width="179" height="86"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="dmnshape-_CE011CA5-7F97-443F-A065-4515EB835821" dmnElementRef="_CE011CA5-7F97-443F-A065-4515EB835821" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor red="255" green="255" blue="255"/>
+          <dmndi:StrokeColor red="0" green="0" blue="0"/>
+          <dmndi:FontColor red="0" green="0" blue="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds x="1024" y="33" width="241" height="121"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="dmnedge-_93EB4C34-2290-404F-9D68-E5842E2A67B7" dmnElementRef="_93EB4C34-2290-404F-9D68-E5842E2A67B7">
+        <di:waypoint x="807.3130841121497" y="296"/>
+        <di:waypoint x="710.5" y="74.5"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="dmnedge-_4457FDD4-62B4-4410-9118-ED430A271D7F" dmnElementRef="_4457FDD4-62B4-4410-9118-ED430A271D7F">
+        <di:waypoint x="807.3130841121497" y="296"/>
+        <di:waypoint x="719" y="436"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="dmnedge-_0CB917E5-CAF8-45E5-A68F-66B2DDE6E271" dmnElementRef="_0CB917E5-CAF8-45E5-A68F-66B2DDE6E271">
+        <di:waypoint x="808" y="74.5"/>
+        <di:waypoint x="1024" y="93.5"/>
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</dmn:definitions>

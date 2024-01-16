@@ -1,0 +1,40 @@
+# Configuration reference
+# https://github-pages.cloud.capitalone.com/bogie/bogie-docs/references/core-files/bogiefile/bogiefile-v1-format/index.html
+
+# vim: syntax=yaml
+
+bogie:
+  ba: BAIDENTITYPOLICYSERVICES
+  asv: ASVIDENTITYPOLICYSERVICES
+  component: Identity Builder Policy Core
+  name: identity-builder-policy-core
+  owner: platformers@capitalone.com
+  team_name: Platformers
+  artemis_onboarding_enabled: false
+  artemis_assessment_owner: dml347
+  artemis_apptype: Application
+pipeline:
+# targeting latest version until library-package fix is stable. remove once merged to stable release.
+  version: latest
+  ci_server: digitechjenkins
+  managed: yes
+  flavor: library-package
+  feature_toggles:
+    gitversion_enabled: yes
+  tasks:
+    build:
+      tool: maven
+      java_version: 17
+      artifact:
+        repository: maven
+    code_analysis:
+      sonar:
+        projectKey: com.capitalone.identity.identitybuilder:identity-builder-policy-core
+        # goals and codeCoverageTool empty to avoid coverage re-run by Sonar as already done by the maven jacoco plugin
+        goals: ''
+        codeCoverageTool: ''
+        withQualityGateCheck: yes
+        opts:
+          - -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+          - -Dsonar.junit.reportPaths=target/surefire-reports
+          - -Dsonar.scm.disabled=true

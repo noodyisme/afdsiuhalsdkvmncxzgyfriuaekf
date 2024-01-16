@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "object",
+  "required": [
+    "document.minAgeDays"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "document.minAgeDays": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 90
+    }
+  }
+}

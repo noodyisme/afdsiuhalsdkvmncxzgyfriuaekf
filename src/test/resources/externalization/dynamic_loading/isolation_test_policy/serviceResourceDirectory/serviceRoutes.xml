@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Required for unit tests -->
+<routes xmlns="http://camel.apache.org/schema/spring">
+	<route id="serviceBundledPolicy">
+		<from uri="direct:serviceBundledPolicy" />
+		<setBody><constant>Hello Route Bundled With Service!</constant></setBody>
+	</route>
+</routes>

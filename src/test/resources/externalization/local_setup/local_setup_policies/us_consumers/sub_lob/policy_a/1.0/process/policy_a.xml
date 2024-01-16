@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--It is important that this policy directory is lexicographically positioned before the 'routes' directory where the pip is stored.-->
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="policy:policy_a">
+        <from uri="policy:policy_a_1.0"/>
+        <log message="Body ${body}"/>
+    </route>
+</routes>

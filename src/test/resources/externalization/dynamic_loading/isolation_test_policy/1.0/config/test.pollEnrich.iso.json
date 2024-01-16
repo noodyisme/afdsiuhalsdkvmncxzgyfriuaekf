@@ -1,0 +1,8 @@
+{
+  "test-config-iso": false,
+  "test-dmn-iso": false,
+  "test-enrich-iso": false,
+  "test-enrichPublic-iso": false,
+  "test-pollEnrich-iso": true,
+  "test-serviceBundled-iso": false
+}

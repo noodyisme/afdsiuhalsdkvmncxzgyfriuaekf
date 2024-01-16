@@ -1,0 +1,10 @@
+{
+  "customer.code": "default-1.0.0",
+  "test-config-iso": false,
+  "test-config-feature-iso": false,
+  "test-dmn-iso": false,
+  "test-serviceBundled-iso": false,
+  "test-enrich-iso": false,
+  "test-pollEnrich-iso": false,
+  "test-enrichPublic-iso": false
+}

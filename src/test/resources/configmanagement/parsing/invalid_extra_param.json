@@ -1,0 +1,8 @@
+{
+  "customer.code": "",
+  "document.check": false,
+  "document.minAgeDays" : 30,
+  "document.extraParam" : "1235",
+  "user.maxRiskScore": 0.6,
+  "user.clearanceCodes": [ "AA", "BB", "CC" ]
+}

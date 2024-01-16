@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "object",
+  "required": [
+    "customer.code",
+    "document.minAgeDays",
+    "document.check",
+    "user.maxRiskScore",
+    "user.clearanceCodes",
+    "dash-incredible_"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "customer.code": {
+      "type": "string"
+    },
+    "document.check": {
+      "type": "boolean"
+    },
+    "document.minAgeDays": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 90
+    },
+    "user.maxRiskScore": {
+      "type": "number",
+      "maximum": 0.9
+    },
+    "user.clearanceCodes": {
+      "type": "array", "items": { "type": "string" }
+    },
+    "dash-incredible_": {
+      "type": "string"
+    }
+  }
+}

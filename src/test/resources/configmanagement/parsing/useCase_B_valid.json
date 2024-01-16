@@ -1,0 +1,9 @@
+{
+  "customer.code": "klm",
+  "document.check": true,
+  "user.clearanceCodes": [
+    "P",
+    "Q",
+    "R"
+  ]
+}

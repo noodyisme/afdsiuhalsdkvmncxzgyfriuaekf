@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="policy:bad_policy_0.0">
+        <from uri="policy:bad_policy_0.0"/>
+
+
+        <doTry>
+            <throwException exceptionType="java.lang.RuntimeException" message=""/>
+            <doCatch>
+                <exception>java.lang.Exception</exception>
+                <to uri="policy-error:forwardDownstreamErrors"/>
+            </doCatch>
+        </doTry>
+
+        <to uri="mock:end"/>
+    </route>
+
+
+    <route id="direct:bad_policy_0.0-illegal-argument-with-cause">
+        <from uri="direct:bad_policy_0.0-illegal-argument-with-cause"/>
+        <doTry>
+            <throwException exceptionType="java.lang.IllegalArgumentException" message="This argument is invalid."/>
+            <doCatch>
+                <exception>java.lang.Exception</exception>
+                <to uri="policy-error:forwardDownstreamErrors"/>
+            </doCatch>
+        </doTry>
+
+        <to uri="mock:end"/>
+    </route>
+
+
+    <route id="direct:bad_policy_0.0-chassis-exception">
+        <from uri="direct:bad_policy_0.0-chassis-exception"/>
+        <doTry>
+            <throwException exceptionType="com.capitalone.chassis.engine.model.exception.ChassisSystemException"
+                            message="cse thrown."/>
+            <doCatch>
+                <exception>java.lang.Exception</exception>
+                <to uri="policy-error:forwardDownstreamErrors"/>
+            </doCatch>
+        </doTry>
+
+        <to uri="mock:end"/>
+    </route>
+
+    <route id="direct:bad_policy_0.0-downstream-valid-exception">
+        <from uri="direct:bad_policy_0.0-downstream-valid-exception"/>
+        <setBody>
+            <groovy>
+                import com.fasterxml.jackson.databind.ObjectMapper;
+                import java.util.Arrays;
+                import java.util.Map;
+                import com.capitalone.identity.identitybuilder.policycore.model.ErrorInfo;
+                import java.util.Collections;
+
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                ErrorInfo eInfo = new ErrorInfo("200200", "This is the text test.", "this was from a downstream error.");
+                return Collections.singletonMap("errorInfo", objectMapper.convertValue(eInfo, Map.class));
+            </groovy>
+        </setBody>
+        <doTry>
+            <script>
+                <groovy>
+                    import com.capitalone.identity.identitybuilder.policycore.camel.util.MockDownstreamException
+
+
+                    throw new MockDownstreamException(body);
+                </groovy>
+            </script>
+
+            <doCatch>
+                <exception>java.lang.Exception</exception>
+                <to uri="policy-error:forwardDownstreamErrors"/>
+            </doCatch>
+        </doTry>
+        <to uri="mock:end"/>
+    </route>
+
+    <route id="direct:bad_policy_0.0-downstream-invalid-exception">
+        <from uri="direct:bad_policy_0.0-downstream-invalid-exception"/>
+        <setBody>
+            <groovy>
+                import com.fasterxml.jackson.databind.ObjectMapper;
+                import java.util.Map;
+                import java.util.Collections;
+                return Collections.singletonMap("policyInfo", "Good Policy.");
+            </groovy>
+        </setBody>
+        <doTry>
+            <script>
+                <groovy>
+                    import com.capitalone.identity.identitybuilder.policycore.camel.util.MockDownstreamException
+
+
+                    throw new MockDownstreamException(body);
+                </groovy>
+            </script>
+
+            <doCatch>
+                <exception>java.lang.Exception</exception>
+                <to uri="policy-error:forwardDownstreamErrors"/>
+            </doCatch>
+        </doTry>
+        <to uri="mock:end"/>
+    </route>
+</routes>

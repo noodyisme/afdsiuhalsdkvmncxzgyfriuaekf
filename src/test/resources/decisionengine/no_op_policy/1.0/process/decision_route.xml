@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="direct:test">
+        <from uri="direct:test"/>
+        <to uri="DmnRulesComponent:execute"/>
+        <to uri="DmnRulesComponent:audit"/>
+    </route>
+</routes>

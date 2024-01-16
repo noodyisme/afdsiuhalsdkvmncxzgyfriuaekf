@@ -1,0 +1,23 @@
+{
+  "l1": "apple",
+  "l2": true,
+  "l3": 101,
+  "l4": 1.1,
+  "l5": "2022-05-20",
+  "r1": true,
+  "r2": true,
+  "r3": 0,
+  "r4": 101,
+  "r5": -1,
+  "complex": {
+    "inputs": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "newInput": 10,
+  "selfReferenceInput": 5
+}

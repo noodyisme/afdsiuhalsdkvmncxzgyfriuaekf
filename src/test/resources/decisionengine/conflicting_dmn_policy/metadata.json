@@ -1,0 +1,45 @@
+{
+  "Name": "regression_policy_with_dmn_rule",
+  "Description": "A regression test policy that calls a single downstream API and a single DMN rule",
+  "Namespace": "ep2_identity_builder_test_policies.us_consumers.ep2_identity_builder_test.mb2.0_regression_policies.regression_policy_with_dmn_rule",
+  "LineOfBusiness": "ep2",
+  "Tenant": "us_consumers",
+  "BusinessUnit": "ep2_identity_builder_test",
+  "Runtime": "Master Builder",
+  "Domain": "",
+  "Owner": "ep2_identity_builder_test",
+  "Permission": "IDS-ADMIN",
+  "SupportTeamEmail": "hofund@capitalone.com",
+  "ClientBusinessApplication": "BAIDENTITYPOLICYSERVICES",
+  "DataClassification": [],
+  "Type": "Journey",
+  "Artifacts": [
+    {
+      "Documentation": ""
+    },
+    {
+      "Process": ""
+    },
+    {
+      "Routes": ""
+    },
+    {
+      "Rules": ""
+    },
+    {
+      "Configs": ""
+    }
+  ],
+  "Author": "bsu831",
+  "Versions_Supported": [
+    {
+      "Version": "2.0",
+      "Status": "IN_PROGRESS"
+    },
+    {
+      "Version": "2.1",
+      "Status": "IN_PROGRESS"
+    }
+  ],
+  "StorageLocation": "https://github.cloud.capitalone.com/identitybuilder-policies/ep2_identity_builder_test_policies/blob/master/us_consumers/ep2_identity_builder_test/mb2.0_regression_policies/regression_policy_with_dmn_rule/metadata.json"
+}

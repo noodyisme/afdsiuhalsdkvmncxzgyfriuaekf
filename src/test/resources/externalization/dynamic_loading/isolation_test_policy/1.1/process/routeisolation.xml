@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="direct:route_isolation">
+        <from uri="direct:route_isolation"/>
+        <!-- NOTE: sub-routes are named similar to policy naming format
+        on purpose to check uri namespace edge-case. -->
+        <to uri="direct:isolation_test_policy_A_1.0"/>
+    </route>
+    <route id="direct:isolation_test_policy_A_1.0">
+        <from uri="direct:isolation_test_policy_A_1.0"/>
+        <to uri="direct:isolation_test_policy_B_1.0"/>
+    </route>
+    <route id="direct:isolation_test_policy_B_1.0">
+        <from uri="direct:isolation_test_policy_B_1.0"/>
+        <setBody>
+            <groovy>
+                [
+                'policyHeader': headers.policyName,
+                'versionHeader' : headers.internalPolicyVersionHeader
+                ]
+            </groovy>
+        </setBody>
+    </route>
+    <!-- This route shouldn't be called from anywhere. It's used to test a 'dangling' route -->
+    <route id="test_unused">
+        <from uri="direct:unused_route"/>
+        <throwException exceptionType="java.lang.RuntimeException"/>
+    </route>
+</routes>

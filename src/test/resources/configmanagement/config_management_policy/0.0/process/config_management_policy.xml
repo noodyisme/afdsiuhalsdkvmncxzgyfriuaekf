@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route id="policy:config_management_policy_0.0">
+    <from uri="policy:config_management_policy_0.0"/>
+    <to uri="policy-configuration:property/customer.code?outputHeaderName=testOutputHeader"/>
+    <when>
+      <simple>true</simple>
+      <!-- Checks policy parsing in a nested level-->
+      <to uri="policy-configuration:property/customer.code?outputHeaderName=testOutputHeader"/>
+    </when>
+    <to uri="mock:end"/>
+  </route>
+</routes>

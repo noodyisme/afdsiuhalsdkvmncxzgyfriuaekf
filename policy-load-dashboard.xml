@@ -1,0 +1,139 @@
+<form>
+  <label>Policy Runtime Loading</label>
+  <description>Runtime Policy Loading Events Dashboard</description>
+  <!--<row>-->
+  <!--  <panel>-->
+  <!--    <html encoded="1">&lt;h1 style="text-align: center;"&gt;Events&lt;/h1&gt;</html>-->
+  <!--  </panel>-->
+  <!--</row>-->
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" token="timeframe">
+      <label>Timeframe</label>
+      <default>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="_applicationCode">
+      <label>Domain</label>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <prefix>EventStreamData.requestContext.applicationCode="</prefix>
+      <initialValue>*</initialValue>
+      <suffix>"</suffix>
+      <fieldForLabel>applicationName</fieldForLabel>
+      <fieldForValue>applicationCode</fieldForValue>
+      <search>
+        <query>index=ciaudit* EventStreamData.eventName="idb-policy-core.runtime-reload.*"
+          | spath path="EventStreamData.requestContext.applicationName" output=applicationName
+          | spath path="EventStreamData.requestContext.applicationCode" output=applicationCode
+          | dedup applicationCode
+          | table  applicationCode, applicationName</query>
+        <earliest>$timeframe.earliest$</earliest>
+        <latest>$timeframe.latest$</latest>
+      </search>
+    </input>
+    <input type="dropdown" token="_environment" searchWhenChanged="false">
+      <label>Environment</label>
+      <choice value="dev">Dev</choice>
+      <choice value="qa">QA</choice>
+      <choice value="perf">Perf</choice>
+      <choice value="UNK">Local</choice>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <prefix>EventStreamData.requestContext.environmentName="</prefix>
+      <suffix>"</suffix>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Events</title>
+        <search>
+          <query>index=ciaudit* EventStreamData.eventName="idb-policy-core.runtime-reload.*"
+            $_applicationCode$
+            $_environment$
+            | timechart count by EventStreamData.eventName</query>
+          <earliest>$timeframe.earliest$</earliest>
+          <latest>$timeframe.latest$</latest>
+          <refresh>2m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Policy Loading Event Log</title>
+        <search>
+          <query>index=ciaudit* EventStreamData.eventName="idb-policy-core.runtime-reload.load"
+            $_applicationCode$
+            $_environment$
+            | spath "EventStreamData.response.entity.id"
+            | spath "EventStreamData.response.entity.type"
+            | spath "EventStreamData.response.result.status"
+            | spath "EventStreamData.response.type"
+            | spath "EventStreamData.requestContext.environmentName"
+            | spath "EventStreamData.requestContext.region"
+            | spath "EventStreamData.requestContext.clusterId"
+            | spath "EventStreamData.requestContext.containerId"
+            | rename EventStreamData.response.entity.type as entity_type,
+            EventStreamData.response.entity.id as entity_id,
+            EventStreamData.response.location as response_location,
+            EventStreamData.response.error as response_error,
+            EventStreamData.response.type as result_type,
+            EventStreamData.response.result.status as result_status,
+            EventStreamData.requestContext.applicationCode as application_code,
+            EventStreamData.requestContext.environmentName as env,
+            EventStreamData.requestContext.region as region,
+            EventStreamData.requestContext.clusterId as cluster,
+            EventStreamData.requestContext.containerId as containerId
+            | eval details=coalesce(response_location, entity_id, response_error)
+            | table  _time, application_code, env, cluster, region, containerId, entity_type, details, result_type, result_status | sort -_time</query>
+          <earliest>$timeframe.earliest$</earliest>
+          <latest>$timeframe.latest$</latest>
+          <refresh>2m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">30</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="result_status">
+          <colorPalette type="map">{"ERROR":#DC4E41}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>polling.properties configuration</title>
+        <search>
+          <query>index=ciaudit* EventStreamData.eventName="idb-policy-core.runtime-reload.polling-configuration"
+            $_applicationCode$
+            $_environment$
+            | spath path="EventStreamData.eventName" output=eventName
+            | spath path="EventStreamData.requestContext.applicationCode" output=applicationCode
+            | spath path="EventStreamData.requestContext.environmentName" output=env
+            | spath path="EventStreamData.requestContext.region" output=region
+            | spath path="EventStreamData.requestContext.clusterId" output=clusterId
+            | spath path="EventStreamData.requestContext.correlationId" output=correlationId
+            | spath path="EventStreamData.requestContext.containerId" output=containerId
+            | spath path="EventStreamData.response.description" output=status
+            | spath path="EventStreamData.response.error" output=error
+            | table _time applicationCode env clusterId region containerId status error
+            | sort -_time</query>
+          <earliest>$timeframe.earliest$</earliest>
+          <latest>$timeframe.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

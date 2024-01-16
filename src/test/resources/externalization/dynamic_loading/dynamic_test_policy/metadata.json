@@ -1,0 +1,12 @@
+{
+  "Versions_Supported": [
+    {
+      "Version": "1.0",
+      "Status": "READY_FOR_PROD"
+    },
+    {
+      "Version": "1.10",
+      "Status": "READY_FOR_PROD"
+    }
+  ]
+}

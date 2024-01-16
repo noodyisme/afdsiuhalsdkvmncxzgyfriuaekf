@@ -1,0 +1,81 @@
+{
+  "$id": "v2",
+  "$defs": {
+    "usecase": {
+      "$schema": "https://json-schema.org/draft/2019-09/schema",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customer.code": {
+          "type": "string"
+        },
+        "test-config-iso": {
+          "type": "boolean"
+        },
+        "test-config-feature-iso": {
+          "type": "boolean"
+        },
+        "test-dmn-iso": {
+          "type": "boolean"
+        },
+        "test-enrich-iso": {
+          "type": "boolean"
+        },
+        "test-enrichPublic-iso": {
+          "type": "boolean"
+        },
+        "test-pollEnrich-iso": {
+          "type": "boolean"
+        },
+        "test-serviceBundled-iso": {
+          "type": "boolean"
+        }
+      }
+    },
+    "defaults": {
+      "allOf": [
+        {
+          "$ref": "usecase"
+        },
+        {
+          "required": [
+            "customer.code",
+            "test-config-iso",
+            "test-config-feature-iso",
+            "test-dmn-iso",
+            "test-enrich-iso",
+            "test-enrichPublic-iso",
+            "test-pollEnrich-iso",
+            "test-serviceBundled-iso"
+          ]
+        }
+      ]
+    },
+    "features": {
+      "$schema": "https://json-schema.org/draft/2019-09/schema",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "test-feature-property-iso": {
+          "type": "string"
+        },
+        "test-feature-property-boolean": {
+          "type": "boolean"
+        }
+      }
+    },
+    "features-required": {
+      "allOf": [
+        {
+          "$ref": "features"
+        },
+        {
+          "required": [
+            "test-feature-property-iso",
+            "test-feature-property-boolean"
+          ]
+        }
+      ]
+    }
+  }
+}

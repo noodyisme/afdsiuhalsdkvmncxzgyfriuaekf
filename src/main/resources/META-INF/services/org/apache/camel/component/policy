@@ -1,0 +1,2 @@
+#class=com.capitalone.identity.identitybuilder.policycore.camel.components.policy.PolicyComponent
+class=org.apache.camel.component.direct.DirectComponent

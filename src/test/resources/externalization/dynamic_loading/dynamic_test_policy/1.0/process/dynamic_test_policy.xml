@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="policy:dynamic_test_policy_1.0">
+        <from uri="policy:dynamic_test_policy_1.0"/>
+        <to uri="direct:dynamicFeatureRunRoute"/>
+    </route>
+
+    <route id="direct:dynamic_test_policy_1.0-schema">
+        <from uri="direct:dynamic_test_policy_1.0-schema"/>
+        <to uri="direct:dynamicFeatureRunRoute"/>
+    </route>
+
+    <route id="isolationRunner">
+        <from uri="direct:dynamicFeatureRunRoute"/>
+
+        <!-- Call config management -->
+        <to uri="policy-configuration:property/customer.code?outputHeaderName=customerCode"/>
+        <transform>
+            <groovy>
+                headers.customerCode;
+            </groovy>
+        </transform>
+
+        <to uri="mock:end"/>
+
+    </route>
+
+</routes>

@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "identitybuilder.policycore.decisionengine.loadEvalFixedThreadPoolSize",
+      "type": "java.lang.Integer",
+      "description": "",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Currently this field is overridden and set to 20 which is no longer needed as a newer field is introduced which sets its value to 20 by default",
+        "replacement": "identitybuilder.policycore.decisionengine.evalFixedThreadPoolSize"
+      }
+    },
+    {
+      "name": "identitybuilder.policycore.feature.config-management.enabled",
+      "type": "java.lang.Boolean",
+      "description": "",
+      "deprecation": {
+        "level": "warning",
+        "reason": "This property has no effect in this version of the library. The feature flag has been removed. Config Management is enabled by default.",
+        "replacement": "None"
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console-Appender" target="SYSTEM_OUT">
+			<PatternLayout>
+				<pattern>
+					[%t] %d{dd MMM yyyy HH:mm:ss,SSSZ}{UTC} UTC %-5p %-15c{1} [%X]: %m%ex%n
+				</pattern>
+				
+			</PatternLayout>
+		</Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="ERROR" includeLocation="false">
+            <AppenderRef ref="Console-Appender"/>	
+        </Root>
+
+        <!-- Needed for runtime update audit logging code coverage -->
+        <Logger name="com.capitalone.identity.identitybuilder.policycore.camel.external.logging" level="info" additivity="false">
+            <!--<AppenderRef ref="Console-Appender"/>-->
+        </Logger>
+    </Loggers>
+</Configuration>

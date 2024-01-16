@@ -1,0 +1,23 @@
+---
+next-version: 2.1.0
+branches:
+  release:
+    regex: ^release/\d+\.\d+\.\d+$
+    mode: ContinuousDelivery
+    tag: ""
+    increment: Patch
+    is-release-branch: true
+  artifact:
+    regex: ^release/
+    mode: ContinuousDelivery
+    tag: "beta"
+    source-branches: ['main']
+    increment: None
+    is-release-branch: false
+  jdk8:
+    regex: ^master
+    mode: ContinuousDelivery
+    tag: "jdk8-throwaway"
+    source-branches: [ 'main' ]
+    increment: None
+    is-release-branch: false

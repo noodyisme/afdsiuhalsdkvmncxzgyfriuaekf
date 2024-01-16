@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+
+    <!-- routes under test call this route to get the latest version number from local policy
+     and not rely on a received argument for policy number -->
+    <route id="setPolicyLocalVersionHeader">
+        <from uri="direct:setPolicyLocalVersionHeader"/>
+        <setHeader name="internalPolicyVersionHeader">
+            <constant>1.1.0</constant>
+        </setHeader>
+    </route>
+
+    <route id="isolationRunner">
+        <from uri="direct:isolatedFeatureRunRoute"/>
+
+        <to uri="policy-configuration:property/test-config-iso?outputHeaderName=doTestConfig"/>
+        <to uri="policy-configuration:property/test-config-feature-iso?outputHeaderName=doTestConfigFeature"/>
+        <to uri="policy-configuration:property/test-dmn-iso?outputHeaderName=doTestDmn"/>
+        <to uri="policy-configuration:property/test-enrich-iso?outputHeaderName=doTestEnrich"/>
+        <to uri="policy-configuration:property/test-enrichPublic-iso?outputHeaderName=doTestEnrichPublic"/>
+        <to uri="policy-configuration:property/test-pollEnrich-iso?outputHeaderName=doTestPoleEnrich"/>
+        <to uri="policy-configuration:property/test-serviceBundled-iso?outputHeaderName=doTestServiceBundled"/>
+
+        <when>
+            <groovy>headers.doTestConfig</groovy>
+            <to uri="direct:isolation_test_policy_1.0-config"/>
+        </when>
+        <when>
+            <groovy>headers.doTestConfigFeature</groovy>
+            <to uri="direct:isolation_test_policy_1.0-config-feature"/>
+        </when>
+
+        <when>
+            <groovy>headers.doTestDmn</groovy>
+            <to uri="direct:isolation_test_policy_1.0-dmn"/>
+        </when>
+        <when>
+            <groovy>headers.doTestEnrich</groovy>
+            <to uri="direct:isolation_test_policy_1.0-enrich"/>
+        </when>
+        <when>
+            <groovy>headers.doTestEnrichPublic</groovy>
+            <to uri="direct:isolation_test_policy_1.0-enrich2"/>
+        </when>
+        <when>
+            <groovy>headers.doTestPoleEnrich</groovy>
+            <to uri="direct:isolation_test_policy_1.0-pollenrich"/>
+        </when>
+        <when>
+            <groovy>headers.doTestServiceBundled</groovy>
+            <to uri="direct:isolation_test_policy_1.0-service-bundled"/>
+        </when>
+
+    </route>
+
+    <route id="policy:isolation_test_policy_1.0">
+        <from uri="policy:isolation_test_policy_1.0"/>
+        <to uri="direct:isolatedFeatureRunRoute"/>
+    </route>
+
+    <route id="policy:isolation_test_policy_1.0-step2">
+        <from uri="policy:isolation_test_policy_1.0-step2"/>
+        <to uri="direct:isolatedFeatureRunRoute"/>
+    </route>
+
+    <route id="direct:isolation_test_policy_1.0-schema">
+        <from uri="direct:isolation_test_policy_1.0-schema"/>
+        <!-- checks pattern observed in policies of schema-to-schema pass-through -->
+        <to uri="direct:isolation_test_policy_1.0-step2-schema"/>
+    </route>
+
+    <route id="direct:isolation_test_policy_1.0-step2-schema">
+        <from uri="direct:isolation_test_policy_1.0-step2-schema"/>
+        <to uri="direct:isolatedFeatureRunRoute"/>
+    </route>
+
+    <route id="direct:isolation_test_policy_1.0-stepNone-schema">
+        <from uri="direct:isolation_test_policy_1.0-stepNone-schema"/>
+        <to uri="direct:setPolicyLocalVersionHeader"/>
+        <setBody>
+            <groovy>
+                [
+                'policy' : 'isolation_test_policy-stepNone-schema',
+                'version' : headers.internalPolicyVersionHeader
+                ]
+            </groovy>
+        </setBody>
+        <to uri="mock:end"/>
+    </route>
+
+
+    <route id="direct:isolation_test_policy_1.0-config">
+        <from uri="direct:isolation_test_policy_1.0-config"/>
+        <to uri="direct:setPolicyLocalVersionHeader"/>
+        <to uri="policy-configuration:property/customer.code?outputHeaderName=customerCode"/>
+        <setBody>
+            <simple>version ${headers.internalPolicyVersionHeader} customer.code is: ${headers.customerCode}</simple>
+        </setBody>
+        <to uri="mock:end"/>
+    </route>
+
+    <route id="direct:isolation_test_policy_1.0-config-feature">
+        <from uri="direct:isolation_test_policy_1.0-config-feature"/>
+        <to uri="direct:setPolicyLocalVersionHeader"/>
+        <to uri="policy-configuration:property/test-feature-property-iso?outputHeaderName=testFeaturePropertyIso"/>
+        <when>
+            <simple>{{policy-config-feature:test-feature-property-boolean}}</simple>
+            <setBody>
+                <simple>version ${headers.internalPolicyVersionHeader} test-feature-property-iso [property={{policy-config-feature:test-feature-property-iso}}, config=${headers.testFeaturePropertyIso}]</simple>
+            </setBody>
+        </when>
+        <to uri="mock:end"/>
+    </route>
+
+    <route id="direct:isolation_test_policy_1.0-dmn">
+        <from uri="direct:isolation_test_policy_1.0-dmn"/>
+        <to uri="direct:setPolicyLocalVersionHeader"/>
+        <setBody>
+            <groovy>
+                [
+                brTransactionName: 'test_rule_duplicate_1.dmn',
+                businessRulesInput: [ 'versionArgument': null ],
+                brDecisionOutputname: 'versionResult'
+                ]
+            </groovy>
+
+        </setBody>
+        <to uri="DmnRulesComponent:execute"/>
+
+        <setHeader name="result1">
+            <groovy>
+                headers.policyRuleResult.getResult()
+            </groovy>
+        </setHeader>
+        <setBody>
+            <groovy>
+                [
+                brTransactionName: 'test_rule_duplicate_2.dmn',
+                businessRulesInput: [ 'versionArgument': null ],
+                brDecisionOutputname: 'versionResult'
+                ]
+            </groovy>
+
+        </setBody>
+        <to uri="DmnRulesComponent:execute"/>
+        <setHeader name="result2">
+            <groovy>
+                headers.policyRuleResult.getResult()
+            </groovy>
+        </setHeader>
+        <setBody>
+            <groovy>
+                [
+                'policy': headers.internalPolicyVersionHeader,
+                'decisionNode1' : headers.result1,
+                'decisionNode2' : headers.result2
+                ]
+            </groovy>
+        </setBody>
+        <to uri="mock:end"/>
+    </route>
+
+    <route id="direct:isolation_test_policy_1.0-service-bundled">
+        <from uri="direct:isolation_test_policy_1.0-service-bundled"/>
+        <to uri="direct:setPolicyLocalVersionHeader"/>
+        <to uri="direct:serviceBundledPolicy"/>
+        <setBody>
+            <groovy>'policy ' + headers.internalPolicyVersionHeader + ' ' + body</groovy>
+        </setBody>
+        <to uri="mock:end"/>
+    </route>
+
+    <route id="direct:isolation_test_policy_1.0-enrich">
+        <from uri="direct:isolation_test_policy_1.0-enrich"/>
+        <to uri="direct:setPolicyLocalVersionHeader"/>
+        <enrich strategyRef="bodyEnrichStrategy">
+            <simple>direct:route_isolation</simple>
+        </enrich>
+        <to uri="mock:end"/>
+    </route>
+
+    <route id="direct:isolation_test_policy_1.0-enrich2">
+        <from uri="direct:isolation_test_policy_1.0-enrich2"/>
+        <to uri="direct:setPolicyLocalVersionHeader"/>
+        <enrich strategyRef="bodyEnrichStrategy">
+            <simple>direct:isolation_test_policy_1.0-stepNone-schema</simple>
+        </enrich>
+    </route>
+
+    <!-- Warning: pollEnrich will cause tests to hang. Added to exercise loading/transformatio only. Do not call. -->
+    <route id="direct:isolation_test_policy_1.0-pollenrich">
+        <from uri="direct:isolation_test_policy_1.0-pollenrich"/>
+        <to uri="direct:setPolicyLocalVersionHeader"/>
+        <pollEnrich strategyRef="bodyEnrichStrategy">
+            <constant>file:src/test/resources/externalization/dynamic_loading/isolation_test_policy/serviceResourceDirectory?fileName=pollEnrichTestFile.txt&amp;noop=true</constant>
+        </pollEnrich>
+        <to uri="mock:end"/>
+    </route>
+</routes>

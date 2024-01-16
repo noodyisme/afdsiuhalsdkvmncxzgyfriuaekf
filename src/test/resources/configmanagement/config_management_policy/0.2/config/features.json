@@ -1,0 +1,4 @@
+{
+  "config.feature.property": "ConfigFeatureProperty-Default",
+  "config.feature.flag": true
+}

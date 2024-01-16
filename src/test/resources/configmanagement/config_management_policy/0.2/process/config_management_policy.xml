@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="policy:config_management_policy_0.2">
+        <from uri="policy:config_management_policy_0.2"/>
+        <!-- This policy leverages non-overridable (feature-level) properties -->
+        <when>
+            <simple>{{policy-config-feature:config.feature.flag}}</simple>
+            <to uri="policy-configuration:property/config.feature.property?outputHeaderName=testOutputHeader"/>
+        </when>
+        <to uri="mock:end"/>
+    </route>
+</routes>

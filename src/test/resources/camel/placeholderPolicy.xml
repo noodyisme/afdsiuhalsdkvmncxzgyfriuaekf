@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Required for unit tests -->
+<routes xmlns="http://camel.apache.org/schema/spring">
+	<route id="policy:pocpolicy1">
+		<from uri="policy:pocpolicy1" />
+		<setBody><constant>Hello World!</constant></setBody>
+	</route>
+</routes>
